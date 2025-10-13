@@ -38,7 +38,7 @@ export const Profile = () => {
       const response = await axios.post(
         'http://localhost:4000/api/configuracion/getConfiguracionUsuario',
         { usuarioId },
-        { headers: { Authorization: `Bearer ${token}` } } // <-- quitar responseType
+        { headers: { Authorization: `Bearer ${token}` } } 
       );
 
       if (response.data.ok) {
