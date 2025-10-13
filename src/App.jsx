@@ -4,6 +4,8 @@ import { Home } from "./pages/Home";
 import { Login } from "./pages/Login";
 import { CreateAccount } from "./pages/CreateAccount";
 import { PrivateRoute } from "./components/PrivateRoute"; // importa tu PrivateRoute
+import { Profile } from "./pages/Profile";
+import { SetupProfile } from "./pages/setupProfile";
 
 function AppContent() {
   const location = useLocation();
@@ -20,6 +22,8 @@ function AppContent() {
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/createAccount" element={<CreateAccount />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/setupProfile" element={<SetupProfile />} />
 
           {/* Ruta protegida */}
           <Route
@@ -27,6 +31,23 @@ function AppContent() {
             element={
               <PrivateRoute>
                 <Home />
+              </PrivateRoute>
+            }
+
+          />
+          <Route
+            path="/profile"
+            element={
+              <PrivateRoute>
+                <Profile />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/setupProfile"
+            element={
+              <PrivateRoute>
+                <SetupProfile />
               </PrivateRoute>
             }
           />

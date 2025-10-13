@@ -36,7 +36,7 @@ function Navbar() {
 
       {/* Íconos y menú */}
       <div className="navbar-right" style={{ marginRight: "10px", display: "flex", alignItems: "center" }}>
-        <Link to="/" className="nav-icon" title="Inicio">
+        <Link to="/home" className="nav-icon" title="Inicio">
           <FaHome />
         </Link>
         <Link to="/profile" className="nav-icon" title="Perfil">
