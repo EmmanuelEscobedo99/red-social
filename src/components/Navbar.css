@@ -1,25 +1,13 @@
-.navbar {
-  position: sticky;
-  top: 0;
-  width: 100%;
-  height: 70px;
-  background-color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-}
 
 /* Logo */
 .logo {
   color: #007bff;
   font-size: 1.5rem;
   font-weight: 700;
+  margin: 0;
 }
 
-/* Centro - barra de búsqueda */
+/* Barra de búsqueda */
 .navbar-center {
   flex: 1;
   display: flex;
@@ -56,7 +44,7 @@
   color: #888;
 }
 
-/* Íconos y login */
+/* Íconos y botón de cerrar sesión */
 .navbar-right {
   display: flex;
   align-items: center;
@@ -91,7 +79,7 @@
 /* Responsive */
 @media (max-width: 768px) {
   .search-box {
-    display: none;
+    display: none; /* Oculta barra de búsqueda en móviles */
   }
 
   .navbar {
@@ -101,4 +89,51 @@
   .logo {
     font-size: 1.3rem;
   }
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center; /* centra verticalmente */
+}
+
+.navbar-logo {
+  height: 70px; /* altura máxima del logo */
+  width: auto;  /* mantiene proporción */
+  object-fit: contain;
+  transition: transform 0.3s;
+}
+
+.navbar-logo:hover {
+  transform: scale(1.05); /* pequeño efecto hover */
+}
+
+@media (max-width: 768px) {
+  .navbar-logo {
+    height: 40px;
+  }
+}
+
+.navbar {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem; /* <-- agrega padding a los lados */
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  z-index: 1000;
+}
+
+.settings-toggle {
+  color: #333; /* color del icono */
+  display: flex;
+  align-items: center;
+}
+
+.settings-toggle:hover {
+  color: #007bff; /* efecto hover azul */
+  text-decoration: none;
 }
