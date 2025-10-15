@@ -1,7 +1,431 @@
-import React from 'react'
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Form,
+  Button,
+  Image,
+} from "react-bootstrap";
+import {
+  FaUpload,
+  FaGlobe,
+  FaFilter,
+  FaHeart,
+  FaRegComment,
+  FaShare,
+} from "react-icons/fa";
 
 export const Home = () => {
+  const [user, setUser] = useState(null);
+  const [config, setConfig] = useState(null);
+  const [fotoPerfilURL, setFotoPerfilURL] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const token = localStorage.getItem("token");
+  const usuarioLocal = JSON.parse(localStorage.getItem("user"));
+  const [postText, setPostText] = useState("");
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+
+  // Estado para controlar comentarios
+  const [activeComments, setActiveComments] = useState({});
+
+  const [posts, setPosts] = useState([
+    {
+      id: 1,
+      user: "María López",
+      username: "@marial",
+      avatar: "https://i.pravatar.cc/48?img=12",
+      text: "Lanzando mi proyecto con NFCW 🚀 #Innovación",
+      image: null,
+      likes: 24,
+      comments: [
+        { user: "Diego", text: "Wow! Suena increíble 🔥" },
+        { user: "Ana", text: "¡Mucho éxito!" },
+      ],
+      shares: 2,
+      liked: false,
+    },
+    {
+      id: 2,
+      user: "Diego Ruiz",
+      username: "@diego.dev",
+      avatar: "https://i.pravatar.cc/48?img=32",
+      text: "Nuevo reto: crea una ilustración en 60 minutos 🎨 #SpeedArt",
+      image: "https://picsum.photos/600/300",
+      likes: 102,
+      comments: [
+        { user: "María", text: "Quiero unirme 😍" },
+        { user: "Pablo", text: "Tremendo reto 👏" },
+      ],
+      shares: 8,
+      liked: true,
+    },
+  ]);
+
+  // --- Perfil ---
+  const handleGetProfile = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:4000/api/usuarios/getUser",
+        { correo: usuarioLocal?.correo },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.data.ok) {
+        setUser(response.data.user);
+        handleGetConfiguracion(response.data.user.id);
+      }
+    } catch (error) {
+      console.error("Error al obtener el perfil:", error);
+      setLoading(false);
+    }
+  };
+
+  const handleGetConfiguracion = async (usuarioId) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:4000/api/configuracion/getConfiguracionUsuario",
+        { usuarioId },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.data.ok) {
+        setConfig(response.data.configuracion);
+        if (response.data.configuracion.fotoPerfil) {
+          const base64 = response.data.configuracion.fotoPerfil;
+          const url = `data:image/jpeg;base64,${base64}`;
+          setFotoPerfilURL(url);
+        }
+      }
+    } catch (error) {
+      console.error("Error al obtener la configuración:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // --- Subir imagen ---
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  // --- Publicar ---
+  const handlePost = () => {
+    if (postText.trim() === "" && !imageFile) return;
+    const newPost = {
+      id: Date.now(),
+      user: user?.nombre || "Tú",
+      username: `@${config?.nombreUsuario || "usuario"}`,
+      avatar:
+        fotoPerfilURL ||
+        "https://cdn-icons-png.flaticon.com/512/1077/1077012.png",
+      text: postText,
+      image: imagePreview,
+      likes: 0,
+      comments: [],
+      shares: 0,
+      liked: false,
+    };
+    setPosts([newPost, ...posts]);
+    setPostText("");
+    setImageFile(null);
+    setImagePreview(null);
+  };
+
+  // ❤️ Me gusta
+  const handleLike = (id) => {
+    setPosts((prev) =>
+      prev.map((post) =>
+        post.id === id
+          ? {
+              ...post,
+              liked: !post.liked,
+              likes: post.liked ? post.likes - 1 : post.likes + 1,
+            }
+          : post
+      )
+    );
+  };
+
+  // 💬 Mostrar/Ocultar comentarios
+  const toggleComments = (id) => {
+    setActiveComments((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
+
+  // ➕ Agregar comentario
+  const handleAddComment = (postId, text) => {
+    if (!text.trim()) return;
+    setPosts((prev) =>
+      prev.map((p) =>
+        p.id === postId
+          ? {
+              ...p,
+              comments: [
+                ...p.comments,
+                { user: user?.nombre || "Tú", text: text.trim() },
+              ],
+            }
+          : p
+      )
+    );
+  };
+
+  const handleShare = (id) => {
+    setPosts((prev) =>
+      prev.map((post) =>
+        post.id === id ? { ...post, shares: post.shares + 1 } : post
+      )
+    );
+    alert("Post compartido 🚀");
+  };
+
+  useEffect(() => {
+    handleGetProfile();
+  }, []);
+
   return (
-    <div>Home</div>
-  )
-}
+    <Container style={{ marginTop: "90px" }}>
+      <Row>
+        <Col md={8}>
+          {/* 📝 Composer */}
+          <Card className="mb-3 shadow-sm">
+            <Card.Body>
+              <div className="d-flex align-items-start">
+                <Image
+                  src={
+                    fotoPerfilURL ||
+                    "https://cdn-icons-png.flaticon.com/512/1077/1077012.png"
+                  }
+                  roundedCircle
+                  width={50}
+                  height={50}
+                  className="me-2 border"
+                  style={{ objectFit: "cover" }}
+                />
+                <Form.Control
+                  as="textarea"
+                  rows={2}
+                  placeholder="¿Qué estás pensando?"
+                  value={postText}
+                  onChange={(e) => setPostText(e.target.value)}
+                />
+              </div>
+
+              {imagePreview && (
+                <div className="mt-2 text-center position-relative">
+                  <img
+                    src={imagePreview}
+                    alt="Vista previa"
+                    className="img-fluid rounded"
+                    style={{ maxHeight: "250px", objectFit: "cover" }}
+                  />
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    onClick={() => setImagePreview(null)}
+                    className="position-absolute top-0 end-0 m-2"
+                  >
+                    ✖
+                  </Button>
+                </div>
+              )}
+
+              <div className="d-flex justify-content-between align-items-center mt-2">
+                <div className="d-flex gap-2">
+                  <Form.Group controlId="formFile" className="mb-0">
+                    <Form.Label
+                      className="btn btn-outline-secondary btn-sm mb-0"
+                      style={{ cursor: "pointer" }}
+                    >
+                      <FaUpload className="me-1" /> Imagen
+                      <Form.Control
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        style={{ display: "none" }}
+                      />
+                    </Form.Label>
+                  </Form.Group>
+
+                  <Button variant="outline-secondary" size="sm">
+                    <FaGlobe className="me-1" /> Público
+                  </Button>
+                  <Button variant="outline-info" size="sm">
+                    <FaFilter className="me-1" /> NFCW
+                  </Button>
+                </div>
+
+                <Button variant="primary" size="sm" onClick={handlePost}>
+                  Publicar
+                </Button>
+              </div>
+            </Card.Body>
+          </Card>
+
+          {/* 📰 Feed */}
+          {posts.map((post) => (
+            <Card key={post.id} className="mb-3 shadow-sm">
+              <Card.Body>
+                <div className="d-flex">
+                  <Image
+                    src={post.avatar}
+                    roundedCircle
+                    className="me-2"
+                    style={{ width: "48px", height: "48px" }}
+                  />
+                  <div className="flex-grow-1">
+                    <h6 className="mb-0">{post.user}</h6>
+                    <small className="text-muted">{post.username}</small>
+                    <p className="mt-2">{post.text}</p>
+                    {post.image && (
+                      <img
+                        src={post.image}
+                        alt="Post"
+                        className="img-fluid rounded mb-2"
+                      />
+                    )}
+
+                    {/* 🔘 Botones */}
+                    <div className="d-flex gap-4 text-muted small mt-2">
+                      <Button
+                        variant="link"
+                        className="p-0 text-decoration-none d-flex align-items-center gap-1"
+                        onClick={() => handleLike(post.id)}
+                      >
+                        <FaHeart color={post.liked ? "red" : "gray"} size={16} />
+                        <span>{post.likes}</span>
+                      </Button>
+
+                      <Button
+                        variant="link"
+                        className="p-0 text-decoration-none d-flex align-items-center gap-1"
+                        onClick={() => toggleComments(post.id)}
+                      >
+                        <FaRegComment size={16} />
+                        <span>{post.comments.length}</span>
+                      </Button>
+
+                      <Button
+                        variant="link"
+                        className="p-0 text-decoration-none d-flex align-items-center gap-1"
+                        onClick={() => handleShare(post.id)}
+                      >
+                        <FaShare size={16} />
+                        <span>{post.shares}</span>
+                      </Button>
+                    </div>
+
+                    {/* 💬 Comentarios */}
+                    {activeComments[post.id] && (
+                      <div className="mt-3 border-top pt-2">
+                        {post.comments.length === 0 && (
+                          <p className="text-muted small">
+                            No hay comentarios aún. Sé el primero.
+                          </p>
+                        )}
+
+                        {post.comments.map((c, i) => (
+                          <div key={i} className="d-flex mb-2">
+                            <Image
+                              src="https://cdn-icons-png.flaticon.com/512/1077/1077012.png"
+                              roundedCircle
+                              width={32}
+                              height={32}
+                              className="me-2"
+                            />
+                            <div className="bg-light p-2 rounded flex-grow-1">
+                              <strong>{c.user}</strong>
+                              <p className="mb-0 small">{c.text}</p>
+                            </div>
+                          </div>
+                        ))}
+
+                        {/* Campo nuevo comentario */}
+                        <Form
+                          className="d-flex mt-2"
+                          onSubmit={(e) => {
+                            e.preventDefault();
+                            const input = e.target.elements[`comment-${post.id}`];
+                            handleAddComment(post.id, input.value);
+                            input.value = "";
+                          }}
+                        >
+                          <Form.Control
+                            name={`comment-${post.id}`}
+                            placeholder="Escribe un comentario..."
+                            size="sm"
+                          />
+                          <Button variant="primary" size="sm" className="ms-2">
+                            Enviar
+                          </Button>
+                        </Form>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </Card.Body>
+            </Card>
+          ))}
+        </Col>
+
+        {/* 📈 Sidebar derecha */}
+        <Col md={4} className="d-none d-md-block">
+          <Card className="mb-3 shadow-sm">
+            <Card.Header className="fw-bold">Tendencias</Card.Header>
+            <Card.Body>
+              <p>#NFCW — Nueva forma de compartir 🔥</p>
+              <p>#React — Creadores unidos ⚛️</p>
+              <p>#Innovación — Lo próximo está aquí 🚀</p>
+            </Card.Body>
+          </Card>
+
+          <Card className="shadow-sm">
+            <Card.Header className="fw-bold">Personas sugeridas</Card.Header>
+            <Card.Body>
+              <div className="d-flex align-items-center mb-2">
+                <Image
+                  src="https://i.pravatar.cc/48?img=18"
+                  roundedCircle
+                  className="me-2"
+                />
+                <div>
+                  <strong>Carlos Vega</strong>
+                  <br />
+                  <small className="text-muted">@carlosv</small>
+                </div>
+                <Button size="sm" className="ms-auto">
+                  Seguir
+                </Button>
+              </div>
+              <div className="d-flex align-items-center">
+                <Image
+                  src="https://i.pravatar.cc/48?img=25"
+                  roundedCircle
+                  className="me-2"
+                />
+                <div>
+                  <strong>Laura Díaz</strong>
+                  <br />
+                  <small className="text-muted">@laurad</small>
+                </div>
+                <Button size="sm" className="ms-auto">
+                  Seguir
+                </Button>
+              </div>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+    </Container>
+  );
+};

@@ -1,0 +1,62 @@
+/* Fondo general */
+.profile-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 90vh;
+  background: linear-gradient(135deg, #f0f3f8 0%, #e8ebf0 100%);
+  padding: 20px;
+}
+
+/* Tarjeta principal */
+.profile-card {
+  max-width: 420px;
+  width: 100%;
+  border-radius: 20px;
+  overflow: hidden;
+  background-color: #fff;
+  position: relative;
+}
+
+/* Encabezado superior decorativo */
+.profile-header {
+  background: linear-gradient(135deg, #1877f2, #8ab4f8);
+  height: 100px;
+}
+
+/* Imagen de perfil */
+.profile-image-wrapper {
+  position: relative;
+  margin-top: -80px;
+}
+
+.profile-image {
+  border: 5px solid #fff;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.profile-image:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 30px rgba(24, 119, 242, 0.3);
+}
+
+/* Texto */
+.profile-card h3 {
+  font-weight: 600;
+}
+
+.profile-card p {
+  font-size: 15px;
+}
+
+/* Estado de carga */
+.profile-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 90vh;
+  color: #1877f2;
+  gap: 10px;
+}
