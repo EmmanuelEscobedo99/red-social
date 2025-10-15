@@ -117,27 +117,67 @@ export const Home = () => {
   };
 
   // --- Publicar ---
-  const handlePost = () => {
+  const handlePost = async () => {
     if (postText.trim() === "" && !imageFile) return;
-    const newPost = {
-      id: Date.now(),
-      user: user?.nombre || "Tú",
-      username: `@${config?.nombreUsuario || "usuario"}`,
-      avatar:
-        fotoPerfilURL ||
-        "https://cdn-icons-png.flaticon.com/512/1077/1077012.png",
-      text: postText,
-      image: imagePreview,
-      likes: 0,
-      comments: [],
-      shares: 0,
-      liked: false,
-    };
-    setPosts([newPost, ...posts]);
-    setPostText("");
-    setImageFile(null);
-    setImagePreview(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("contenido", postText);
+      formData.append("usuarioId", user?.id);
+      if (imageFile) formData.append("imagen", imageFile);
+
+      const token = localStorage.getItem("token");
+
+      const response = await axios.post(
+        "http://localhost:4000/api/publicacionesUsuario/crearPublicacion",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data.ok) {
+        const nueva = response.data.publicacion;
+
+        const base64 = nueva.imagen && nueva.imagen.data
+        const image = nueva.imagen ? `data:image/jpeg;base64,${nueva.imagen}` : null;
+
+        // Convertir imagen base64 si existe
+        /*const image =
+          nueva.imagen && nueva.imagen.data
+            ? `data:image/jpeg;base64,${Buffer.from(
+              nueva.imagen.data
+            ).toString("base64")}`
+            : null;*/
+
+        const newPost = {
+          id: nueva.id,
+          user: user?.nombre || "Tú",
+          username: `@${config?.nombreUsuario || "usuario"}`,
+          avatar:
+            fotoPerfilURL ||
+            "https://cdn-icons-png.flaticon.com/512/1077/1077012.png",
+          text: nueva.contenido,
+          image,
+          likes: 0,
+          comments: [],
+          shares: 0,
+          liked: false,
+        };
+
+        setPosts((prev) => [newPost, ...prev]);
+        setPostText("");
+        setImageFile(null);
+        setImagePreview(null);
+      }
+    } catch (error) {
+      console.error("Error al publicar:", error);
+    }
   };
+
 
   // ❤️ Me gusta
   const handleLike = (id) => {
@@ -145,10 +185,10 @@ export const Home = () => {
       prev.map((post) =>
         post.id === id
           ? {
-              ...post,
-              liked: !post.liked,
-              likes: post.liked ? post.likes - 1 : post.likes + 1,
-            }
+            ...post,
+            liked: !post.liked,
+            likes: post.liked ? post.likes - 1 : post.likes + 1,
+          }
           : post
       )
     );
@@ -169,12 +209,12 @@ export const Home = () => {
       prev.map((p) =>
         p.id === postId
           ? {
-              ...p,
-              comments: [
-                ...p.comments,
-                { user: user?.nombre || "Tú", text: text.trim() },
-              ],
-            }
+            ...p,
+            comments: [
+              ...p.comments,
+              { user: user?.nombre || "Tú", text: text.trim() },
+            ],
+          }
           : p
       )
     );

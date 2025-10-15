@@ -1,62 +1,106 @@
 /* Fondo general */
 .profile-page {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 90vh;
-  background: linear-gradient(135deg, #f0f3f8 0%, #e8ebf0 100%);
-  padding: 20px;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #f0f2f5;
 }
 
-/* Tarjeta principal */
-.profile-card {
-  max-width: 420px;
+/* Header perfil */
+.profile-header-section {
   width: 100%;
-  border-radius: 20px;
-  overflow: hidden;
-  background-color: #fff;
-  position: relative;
+  background: linear-gradient(135deg, #1877f2, #4a8ef1);
+  padding: 20px 40px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  color: #fff;
 }
 
-/* Encabezado superior decorativo */
-.profile-header {
-  background: linear-gradient(135deg, #1877f2, #8ab4f8);
-  height: 100px;
+.profile-header-section .profile-image {
+  border: 4px solid #fff;
+  width: 80px;
+  height: 80px;
 }
 
-/* Imagen de perfil */
-.profile-image-wrapper {
-  position: relative;
-  margin-top: -80px;
-}
-
-.profile-image {
-  border: 5px solid #fff;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.profile-image:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 30px rgba(24, 119, 242, 0.3);
-}
-
-/* Texto */
-.profile-card h3 {
+.profile-header-section h3 {
+  margin: 0;
   font-weight: 600;
 }
 
-.profile-card p {
-  font-size: 15px;
+.profile-header-section p {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.8;
 }
 
-/* Estado de carga */
-.profile-loading {
+/* Contenedor principal debajo del header */
+.profile-content {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 1400px;
+  margin: 20px auto;
+  gap: 20px;
+}
+
+/* Columnas */
+.profile-left,
+.profile-center,
+.profile-right {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 90vh;
-  color: #1877f2;
-  gap: 10px;
+  gap: 20px;
 }
+
+.profile-left {
+  flex: 1;
+  max-width: 300px;
+}
+
+.profile-center {
+  flex: 2;
+  max-width: 600px;
+}
+
+.profile-right {
+  flex: 1;
+  max-width: 300px;
+}
+
+/* Tarjetas */
+.profile-card,
+.post-card,
+.profile-bio-card,
+.profile-friends-card,
+.profile-photos-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.05);
+  transition: box-shadow 0.3s ease;
+}
+
+.profile-card:hover,
+.post-card:hover {
+  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+/* Publicaciones */
+.posts-section h4 {
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+}
+
+/* Acciones de post */
+.post-actions span {
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.post-actions span:hover {
+  color: #1877f2;
+}
+
