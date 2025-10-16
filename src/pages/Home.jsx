@@ -17,6 +17,7 @@ import {
   FaRegComment,
   FaShare,
 } from "react-icons/fa";
+import { toggleLike, addComment, sharePost } from "../helpers/usePostsHelper";
 
 export const Home = () => {
   const [user, setUser] = useState(null);
@@ -25,6 +26,7 @@ export const Home = () => {
   const [loading, setLoading] = useState(true);
   const token = localStorage.getItem("token");
   const usuarioLocal = JSON.parse(localStorage.getItem("user"));
+  const modoSombra = localStorage.getItem("modoSombra") === "true";
   const [postText, setPostText] = useState("");
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -179,22 +181,13 @@ export const Home = () => {
   };
 
 
-  // ❤️ Me gusta
+  // Me gusta
   const handleLike = (id) => {
-    setPosts((prev) =>
-      prev.map((post) =>
-        post.id === id
-          ? {
-            ...post,
-            liked: !post.liked,
-            likes: post.liked ? post.likes - 1 : post.likes + 1,
-          }
-          : post
-      )
-    );
+    setPosts((prev) => toggleLike(prev, id));
   };
 
-  // 💬 Mostrar/Ocultar comentarios
+
+  // Mostrar/Ocultar comentarios
   const toggleComments = (id) => {
     setActiveComments((prev) => ({
       ...prev,
@@ -202,32 +195,18 @@ export const Home = () => {
     }));
   };
 
-  // ➕ Agregar comentario
+  // Agregar comentario
   const handleAddComment = (postId, text) => {
-    if (!text.trim()) return;
-    setPosts((prev) =>
-      prev.map((p) =>
-        p.id === postId
-          ? {
-            ...p,
-            comments: [
-              ...p.comments,
-              { user: user?.nombre || "Tú", text: text.trim() },
-            ],
-          }
-          : p
-      )
-    );
+    const modoSombra = localStorage.getItem("modoSombra") === "true";
+    setPosts((prev) => addComment(prev, postId, text, user, modoSombra));
   };
 
+  // Compartir
   const handleShare = (id) => {
-    setPosts((prev) =>
-      prev.map((post) =>
-        post.id === id ? { ...post, shares: post.shares + 1 } : post
-      )
-    );
+    setPosts((prev) => sharePost(prev, id));
     alert("Post compartido 🚀");
   };
+
 
   useEffect(() => {
     handleGetProfile();
@@ -237,7 +216,7 @@ export const Home = () => {
     <Container style={{ marginTop: "90px" }}>
       <Row>
         <Col md={8}>
-          {/* 📝 Composer */}
+          {/* Composer */}
           <Card className="mb-3 shadow-sm">
             <Card.Body>
               <div className="d-flex align-items-start">

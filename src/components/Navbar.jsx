@@ -6,23 +6,49 @@ import {
   FaSearch,
   FaCog,
   FaPlusCircle,
+  FaUserSecret,
 } from "react-icons/fa";
-import { Dropdown, Badge, InputGroup, Form, Button, Navbar, Container, Nav } from "react-bootstrap";
-import { useState } from "react";
-import logo from "../assets/public/Logo Logotipo Centro Creativo para Niños Infantil Colorido Rosa.png";
+import {
+  Dropdown,
+  Badge,
+  InputGroup,
+  Form,
+  Button,
+  Navbar,
+  Container,
+  Nav,
+} from "react-bootstrap";
+import { useState, useEffect } from "react";
 import "./Navbar.css";
 
 function AppNavbar() {
   const navigate = useNavigate();
+
   const [notificaciones, setNotificaciones] = useState([
     { id: 1, texto: "Tienes un nuevo mensaje de Ana" },
     { id: 2, texto: "Carlos comentó tu publicación" },
     { id: 3, texto: "Nuevo seguidor: Laura" },
   ]);
 
+  // 🔒 Estado del modo sombra
+  const [modoSombra, setModoSombra] = useState(
+    localStorage.getItem("modoSombra") === "true"
+  );
+
+  // 🔁 Mantener sincronizado el modo sombra en localStorage
+  useEffect(() => {
+    localStorage.setItem("modoSombra", modoSombra ? "true" : "false");
+  }, [modoSombra]);
+
+  // 🔄 Cambiar modo sombra
+  const toggleModoSombra = () => {
+    setModoSombra((prev) => !prev);
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    localStorage.removeItem("modoSombra");
     navigate("/");
   };
 
@@ -31,13 +57,15 @@ function AppNavbar() {
       bg="light"
       expand="lg"
       fixed="top"
-      className="shadow-sm py-2 navbar-surface"
+      className={`shadow-sm py-2 navbar-surface ${
+        modoSombra ? "navbar-sombra" : ""
+      }`}
     >
       <Container fluid className="px-4">
         {/* LOGO */}
-        <Navbar.Brand className="fw-bold text-primary">
-            SURFACE<span className="text-dark">+</span>
-          </Navbar.Brand>
+        <Navbar.Brand className="fw-bold text-primary d-flex align-items-center">
+          SURFACE<span className="text-dark">+</span>
+        </Navbar.Brand>
 
         {/* BUSCADOR */}
         <div className="d-none d-md-flex mx-auto w-50">
@@ -66,7 +94,7 @@ function AppNavbar() {
             <FaUserCircle size={21} />
           </Link>
 
-          {/* NOTIFICACIONES */}
+          {/* 🔔 NOTIFICACIONES */}
           <Dropdown align="end">
             <Dropdown.Toggle
               variant="link"
@@ -94,7 +122,7 @@ function AppNavbar() {
             </Dropdown.Menu>
           </Dropdown>
 
-          {/* CONFIGURACIÓN */}
+          {/* ⚙️ CONFIGURACIÓN */}
           <Dropdown align="end">
             <Dropdown.Toggle
               variant="link"
@@ -116,6 +144,25 @@ function AppNavbar() {
               </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
+
+          {/* 🌑 MODO SOMBRA */}
+          <div
+            className="d-flex align-items-center ms-3"
+            title="Modo Sombra (Publicar o comentar de forma anónima)"
+          >
+            <FaUserSecret
+              size={20}
+              className={modoSombra ? "text-dark" : "text-secondary"}
+              style={{ marginRight: "6px" }}
+            />
+            <Form.Check
+              type="switch"
+              id="modo-sombra-switch"
+              label="Sombra"
+              checked={modoSombra}
+              onChange={toggleModoSombra}
+            />
+          </div>
         </Nav>
       </Container>
     </Navbar>
