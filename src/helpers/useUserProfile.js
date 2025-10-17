@@ -3,16 +3,36 @@ import axios from "axios";
 
 /**
  * Hook personalizado para obtener perfil y configuración del usuario autenticado.
- * Retorna: { user, config, fotoPerfilURL, loading, reloadUser }
  */
 export const useUserProfile = () => {
   const [user, setUser] = useState(null);
   const [config, setConfig] = useState(null);
   const [fotoPerfilURL, setFotoPerfilURL] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [usuariosSugeridos, setUsuariosSugeridos] = useState([]);
 
   const token = localStorage.getItem("token");
   const usuarioLocal = JSON.parse(localStorage.getItem("user"));
+
+  // Obtener usuarios para sugerencias de amistad
+  const fetchUsuarios = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const usuarioLocal = JSON.parse(localStorage.getItem("user"));
+
+        const response = await axios.post(
+          "http://localhost:4000/api/usuarios/getAllUsers",
+          { usuarioId: usuarioLocal?.id },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        if (response.data.ok) {
+          setUsuariosSugeridos(response.data.usuarios);
+        }
+      } catch (error) {
+        console.error("Error al obtener usuarios:", error);
+      }
+    };
 
   // Obtener datos del usuario
   const handleGetProfile = async () => {
@@ -69,8 +89,9 @@ export const useUserProfile = () => {
   // Cargar automáticamente al montar
   useEffect(() => {
     handleGetProfile();
+    fetchUsuarios();
   }, []);
 
   // Retornar datos y funciones útiles
-  return { user, config, fotoPerfilURL, loading, reloadUser: handleGetProfile };
+  return { user, config, fotoPerfilURL, loading, reloadUser: handleGetProfile, usuariosSugeridos };
 };

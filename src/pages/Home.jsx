@@ -18,8 +18,11 @@ import {
   FaShare,
 } from "react-icons/fa";
 import { toggleLike, addComment, sharePost } from "../helpers/usePostsHelper";
+import { useUserProfile } from "../helpers/useUserProfile";
 
 export const Home = () => {
+  const { usuariosSugeridos } = useUserProfile();
+  const [usuariosConAvatar, setUsuariosConAvatar] = useState([]);
   const [user, setUser] = useState(null);
   const [config, setConfig] = useState(null);
   const [fotoPerfilURL, setFotoPerfilURL] = useState(null);
@@ -97,8 +100,7 @@ export const Home = () => {
       if (response.data.ok) {
         setConfig(response.data.configuracion);
         if (response.data.configuracion.fotoPerfil) {
-          const base64 = response.data.configuracion.fotoPerfil;
-          const url = `data:image/jpeg;base64,${base64}`;
+          const url = `data:image/jpeg;base64,${response.data.configuracion.fotoPerfil}`;
           setFotoPerfilURL(url);
         }
       }
@@ -128,8 +130,6 @@ export const Home = () => {
       formData.append("usuarioId", user?.id);
       if (imageFile) formData.append("imagen", imageFile);
 
-      const token = localStorage.getItem("token");
-
       const response = await axios.post(
         "http://localhost:4000/api/publicacionesUsuario/crearPublicacion",
         formData,
@@ -143,17 +143,7 @@ export const Home = () => {
 
       if (response.data.ok) {
         const nueva = response.data.publicacion;
-
-        const base64 = nueva.imagen && nueva.imagen.data
         const image = nueva.imagen ? `data:image/jpeg;base64,${nueva.imagen}` : null;
-
-        // Convertir imagen base64 si existe
-        /*const image =
-          nueva.imagen && nueva.imagen.data
-            ? `data:image/jpeg;base64,${Buffer.from(
-              nueva.imagen.data
-            ).toString("base64")}`
-            : null;*/
 
         const newPost = {
           id: nueva.id,
@@ -180,12 +170,10 @@ export const Home = () => {
     }
   };
 
-
   // Me gusta
   const handleLike = (id) => {
     setPosts((prev) => toggleLike(prev, id));
   };
-
 
   // Mostrar/Ocultar comentarios
   const toggleComments = (id) => {
@@ -197,7 +185,6 @@ export const Home = () => {
 
   // Agregar comentario
   const handleAddComment = (postId, text) => {
-    const modoSombra = localStorage.getItem("modoSombra") === "true";
     setPosts((prev) => addComment(prev, postId, text, user, modoSombra));
   };
 
@@ -207,6 +194,41 @@ export const Home = () => {
     alert("Post compartido 🚀");
   };
 
+  // --- Fetch Avatares y nombreUsuario ---
+  useEffect(() => {
+    const fetchAvatares = async () => {
+      const token = localStorage.getItem("token");
+
+      const usuarios = await Promise.all(
+        usuariosSugeridos.map(async (u) => {
+          try {
+            const response = await axios.post(
+              "http://localhost:4000/api/configuracion/getConfiguracionUsuario",
+              { usuarioId: u.id },
+              { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            const avatar = response.data.ok && response.data.configuracion.fotoPerfil
+              ? `data:image/jpeg;base64,${response.data.configuracion.fotoPerfil}`
+              : "https://i.pravatar.cc/48";
+
+            const nombreUsuario = response.data.ok && response.data.configuracion.nombreUsuario
+              ? response.data.configuracion.nombreUsuario
+              : u.nombre || "usuario";
+
+            return { ...u, avatar, nombreUsuario };
+          } catch (error) {
+            console.error("Error al obtener configuración de usuario:", error);
+            return { ...u, avatar: "https://i.pravatar.cc/48", nombreUsuario: u.nombre || "usuario" };
+          }
+        })
+      );
+
+      setUsuariosConAvatar(usuarios);
+    };
+
+    if (usuariosSugeridos.length > 0) fetchAvatares();
+  }, [usuariosSugeridos]);
 
   useEffect(() => {
     handleGetProfile();
@@ -369,7 +391,6 @@ export const Home = () => {
                           </div>
                         ))}
 
-                        {/* Campo nuevo comentario */}
                         <Form
                           className="d-flex mt-2"
                           onSubmit={(e) => {
@@ -411,36 +432,37 @@ export const Home = () => {
           <Card className="shadow-sm">
             <Card.Header className="fw-bold">Personas sugeridas</Card.Header>
             <Card.Body>
-              <div className="d-flex align-items-center mb-2">
-                <Image
-                  src="https://i.pravatar.cc/48?img=18"
-                  roundedCircle
-                  className="me-2"
-                />
-                <div>
-                  <strong>Carlos Vega</strong>
-                  <br />
-                  <small className="text-muted">@carlosv</small>
+              {usuariosConAvatar.slice(0, 3).map((u) => (
+                <div key={u.id} className="d-flex align-items-center justify-content-between mb-3">
+                  <div className="d-flex align-items-center">
+                    <Image
+                      src={u.avatar}
+                      roundedCircle
+                      width={40}
+                      height={40}
+                      className="me-2"
+                      style={{ objectFit: "cover" }}
+                    />
+                    <div>
+                      <div className="fw-bold">{u.nombre}</div>
+                      <small className="text-muted">
+                        @{u.nombreUsuario.toLowerCase().replace(/\s/g, "")}
+                      </small>
+                    </div>
+                  </div>
+                  <Button size="sm" variant="primary">
+                    Seguir
+                  </Button>
                 </div>
-                <Button size="sm" className="ms-auto">
-                  Seguir
-                </Button>
-              </div>
-              <div className="d-flex align-items-center">
-                <Image
-                  src="https://i.pravatar.cc/48?img=25"
-                  roundedCircle
-                  className="me-2"
-                />
-                <div>
-                  <strong>Laura Díaz</strong>
-                  <br />
-                  <small className="text-muted">@laurad</small>
+              ))}
+
+              {usuariosConAvatar.length > 3 && (
+                <div className="text-center mt-2">
+                  <Button variant="link" size="sm">
+                    Ver más
+                  </Button>
                 </div>
-                <Button size="sm" className="ms-auto">
-                  Seguir
-                </Button>
-              </div>
+              )}
             </Card.Body>
           </Card>
         </Col>

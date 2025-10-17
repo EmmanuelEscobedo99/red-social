@@ -3,7 +3,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { Button, Card, Container, Row, Col, Form as BootstrapForm } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import logo from "../assets/public/Logo Logotipo Centro Creativo para Niños Infantil Colorido Rosa.png";
+import logo from "../assets/public/Logotipo marketing digital y social media marca personal creativo azul y coral (1).png";
 import axios from "axios";
 import Swal from "sweetalert2";
 
