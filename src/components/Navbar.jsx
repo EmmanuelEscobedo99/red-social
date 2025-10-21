@@ -7,13 +7,13 @@ import {
   FaCog,
   FaPlusCircle,
   FaUserSecret,
+  FaMoon,
 } from "react-icons/fa";
 import {
   Dropdown,
   Badge,
   InputGroup,
   Form,
-  Button,
   Navbar,
   Container,
   Nav,
@@ -38,6 +38,16 @@ function AppNavbar() {
   // 🔁 Mantener sincronizado el modo sombra en localStorage
   useEffect(() => {
     localStorage.setItem("modoSombra", modoSombra ? "true" : "false");
+    window.dispatchEvent(new Event("modoSombraChanged"));
+  }, [modoSombra]);
+
+  // 🌑 Aplicar clase global al body para modo sombra
+  useEffect(() => {
+    if (modoSombra) {
+      document.body.classList.add("modo-sombra-activo");
+    } else {
+      document.body.classList.remove("modo-sombra-activo");
+    }
   }, [modoSombra]);
 
   // 🔄 Cambiar modo sombra
@@ -52,6 +62,16 @@ function AppNavbar() {
     navigate("/");
   };
 
+  // 🔗 Links del Reino Sombra
+  const sombraLinks = [
+    { path: "/sombra/foros", label: "Foros" },
+    { path: "/sombra/chat", label: "Charlas 10 min" },
+    { path: "/sombra/encuentro", label: "Encuentros" },
+    { path: "/sombra/diario", label: "Diario" },
+    { path: "/sombra/analisis", label: "Análisis IA" },
+    { path: "/sombra/perfil", label: "Perfil" },
+  ];
+
   return (
     <Navbar
       bg="light"
@@ -63,7 +83,11 @@ function AppNavbar() {
     >
       <Container fluid className="px-4">
         {/* LOGO */}
-        <Navbar.Brand className="fw-bold text-primary d-flex align-items-center">
+        <Navbar.Brand
+          className="fw-bold text-primary d-flex align-items-center"
+          style={{ cursor: "pointer" }}
+          onClick={() => navigate("/home")}
+        >
           SURFACE<span className="text-dark">+</span>
         </Navbar.Brand>
 
@@ -146,23 +170,56 @@ function AppNavbar() {
           </Dropdown>
 
           {/* 🌑 MODO SOMBRA */}
-          <div
-            className="d-flex align-items-center ms-3"
-            title="Modo Sombra (Publicar o comentar de forma anónima)"
-          >
-            <FaUserSecret
-              size={20}
-              className={modoSombra ? "text-dark" : "text-secondary"}
-              style={{ marginRight: "6px" }}
-            />
-            <Form.Check
-              type="switch"
-              id="modo-sombra-switch"
-              label="Sombra"
-              checked={modoSombra}
-              onChange={toggleModoSombra}
-            />
-          </div>
+          <Dropdown align="end">
+            <Dropdown.Toggle
+              variant="link"
+              id="modo-sombra-toggle"
+              className="d-flex align-items-center nav-icon"
+              title="Modo Sombra (Publicar o comentar de forma anónima)"
+            >
+              <FaUserSecret
+                size={20}
+                className={modoSombra ? "text-dark" : "text-secondary"}
+                style={{ marginRight: "6px" }}
+              />
+              <Form.Check
+                type="switch"
+                id="modo-sombra-switch"
+                checked={modoSombra}
+                onChange={toggleModoSombra}
+              />
+            </Dropdown.Toggle>
+
+            {/* Si el modo sombra está activo, se despliega el menú del Reino */}
+            {modoSombra && (
+              <Dropdown.Menu className="shadow-lg bg-dark text-light border-0 mt-2">
+                <Dropdown.Header className="text-center text-info">
+                  <FaMoon className="me-2" />
+                  Reino de las Sombras
+                </Dropdown.Header>
+                {sombraLinks.map((item) => (
+                  <Dropdown.Item
+                    key={item.path}
+                    as={Link}
+                    to={item.path}
+                    className="text-light"
+                    style={{
+                      background: "transparent",
+                      transition: "0.2s",
+                    }}
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.background = "#111")
+                    }
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.background = "transparent")
+                    }
+                  >
+                    {item.label}
+                  </Dropdown.Item>
+                ))}
+              </Dropdown.Menu>
+            )}
+          </Dropdown>
         </Nav>
       </Container>
     </Navbar>

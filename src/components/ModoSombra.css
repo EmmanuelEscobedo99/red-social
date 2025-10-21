@@ -1,0 +1,124 @@
+/* =====================
+   MODO SOMBRA GLOBAL
+===================== */
+body.modo-sombra-activo {
+  background-color: #0b0b0f !important;
+  color: #eee !important;
+  transition: all 0.3s ease;
+}
+
+/* NAVBAR */
+body.modo-sombra-activo .navbar,
+body.modo-sombra-activo .navbar-light,
+body.modo-sombra-activo .navbar-surface {
+  background-color: #111 !important;
+  color: #eee !important;
+  border-bottom: 1px solid #222 !important;
+}
+
+body.modo-sombra-activo .navbar a.nav-link,
+body.modo-sombra-activo .navbar-brand {
+  color: #eee !important;
+}
+
+/* BUSCADOR */
+body.modo-sombra-activo .form-control {
+  background-color: #1a1a1a !important;
+  color: #eee !important;
+  border-color: #333 !important;
+}
+
+body.modo-sombra-activo .input-group-text {
+  background-color: #1a1a1a !important;
+  color: #eee !important;
+  border-color: #333 !important;
+}
+
+/* DROPDOWNS */
+body.modo-sombra-activo .dropdown-menu {
+  background-color: #111 !important;
+  color: #eee !important;
+  border-color: #222 !important;
+}
+
+body.modo-sombra-activo .dropdown-item {
+  color: #eee !important;
+}
+
+body.modo-sombra-activo .dropdown-item:hover {
+  background-color: #222 !important;
+}
+
+/* BADGES */
+body.modo-sombra-activo .badge {
+  background-color: #bb0000 !important;
+  color: #fff !important;
+}
+
+/* BOTONES */
+body.modo-sombra-activo .btn {
+  background-color: #222 !important;
+  color: #eee !important;
+  border-color: #333 !important;
+}
+
+body.modo-sombra-activo .btn:hover {
+  background-color: #333 !important;
+}
+
+/* TARJETAS / CARDS */
+body.modo-sombra-activo .card {
+  background-color: #111 !important;
+  color: #eee !important;
+  border-color: #222 !important;
+}
+
+/* LINKS */
+body.modo-sombra-activo a {
+  color: #9ecfff !important;
+}
+
+body.modo-sombra-activo a:hover {
+  color: #6fb1fc !important;
+}
+
+/* TEXTAREAS */
+body.modo-sombra-activo textarea {
+  background-color: #1a1a1a !important;
+  color: #eee !important;
+  border-color: #333 !important;
+}
+
+/* =====================
+   AJUSTES MODO SOMBRA
+===================== */
+
+/* ICONO MODO SOMBRA */
+body.modo-sombra-activo .fa-user-secret {
+  color: #fff !important;
+}
+
+/* NOMBRES DE USUARIO en Home o sugeridos */
+body.modo-sombra-activo .username,
+body.modo-sombra-activo .user-suggested {
+  color: #fff !important;
+}
+
+/* Placeholder "¿En qué estás pensando?" en input de publicaciones */
+body.modo-sombra-activo ::placeholder {
+  color: #ccc !important;
+  opacity: 1;
+}
+
+/* Texto dentro de inputs y textarea en modo sombra */
+body.modo-sombra-activo input,
+body.modo-sombra-activo textarea {
+  color: #eee !important;
+}
+
+/* Botones y links de publicación */
+body.modo-sombra-activo .post-button,
+body.modo-sombra-activo .post-link {
+  color: #eee !important;
+}
+
