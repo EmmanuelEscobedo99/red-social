@@ -19,6 +19,7 @@ import {
 } from "react-icons/fa";
 import { toggleLike, addComment, sharePost } from "../helpers/usePostsHelper";
 import { useUserProfile } from "../helpers/useUserProfile";
+import { useNavigate } from "react-router-dom";
 
 export const Home = () => {
   const { usuariosSugeridos } = useUserProfile();
@@ -33,6 +34,7 @@ export const Home = () => {
   const [postText, setPostText] = useState("");
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const navigate = useNavigate();
 
   // Estado para controlar comentarios
   const [activeComments, setActiveComments] = useState({});
@@ -71,6 +73,11 @@ export const Home = () => {
   ]);
 
   // --- Perfil ---
+
+  const handleViewProfile = (userId) => {
+    navigate(`/profileUser/${userId}`);
+  };
+
   const handleGetProfile = async () => {
     try {
       const response = await axios.post(
@@ -450,8 +457,8 @@ export const Home = () => {
                       </small>
                     </div>
                   </div>
-                  <Button size="sm" variant="primary">
-                    Seguir
+                  <Button size="sm" variant="primary" onClick={() => handleViewProfile(u.id)}>
+                    Ver perfil
                   </Button>
                 </div>
               ))}

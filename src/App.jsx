@@ -14,6 +14,7 @@ import { DiarioSombra } from "./components/DiarioSombra";
 import { AnalisisSombra } from "./components/AnalisisSombra";
 import { PerfilSombra } from "./components/PerfilSombra";
 import "./components/ModoSombra.css";
+import { ProfileUser } from "./pages/ProfileUser";
 
 
 function AppContent() {
@@ -40,6 +41,7 @@ function AppContent() {
           <Route path="/sombra/diario" element={<DiarioSombra />} />
           <Route path="/sombra/analisis" element={<AnalisisSombra />} />
           <Route path="/sombra/perfil" element={<PerfilSombra />} />
+          <Route path="/profileUser/:id" element={<ProfileUser />} />
 
           {/* Ruta protegida */}
           <Route
@@ -117,6 +119,14 @@ function AppContent() {
           />
           <Route
             path="/sombra/perfil"
+            element={
+              <PrivateRoute>
+                <PerfilSombra />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/profileUser/:id"
             element={
               <PrivateRoute>
                 <PerfilSombra />
